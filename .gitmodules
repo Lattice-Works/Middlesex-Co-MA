@@ -1,0 +1,9 @@
+[submodule "Cambridge-PD"]
+	path = Cambridge-PD
+	url = git@github.com:Lattice-Works/Cambridge-PD.git
+[submodule "Burlington-PD"]
+	path = Burlington-PD
+	url = git@github.com:Lattice-Works/Burlington-PD.git
+[submodule "Middlesex"]
+	path = Middlesex
+	url = git@github.com:Lattice-Works/Middlesex.git
