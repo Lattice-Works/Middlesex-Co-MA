@@ -7,3 +7,6 @@
 [submodule "Middlesex"]
 	path = Middlesex
 	url = git@github.com:Lattice-Works/Middlesex.git
+[submodule "NorthReading-PD"]
+	path = NorthReading-PD
+	url = https://github.com/Lattice-Works/NorthReading-PD.git
