@@ -10,3 +10,6 @@
 [submodule "NorthReading-PD"]
 	path = NorthReading-PD
 	url = https://github.com/Lattice-Works/NorthReading-PD.git
+[submodule "Acton-PD"]
+	path = Acton-PD
+	url = https://github.com/Lattice-Works/Acton-PD.git
