@@ -25,3 +25,6 @@
 [submodule "Lowell-MA-PD"]
 	path = Lowell-MA-PD
 	url = https://github.com/Lattice-Works/Lowell-MA-PD.git
+[submodule "Reading-MA-PD"]
+	path = Reading-MA-PD
+	url = https://github.com/Lattice-Works/Reading-MA-PD.git
