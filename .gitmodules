@@ -19,3 +19,9 @@
 [submodule "Billerica-MA-PD"]
 	path = Billerica-MA-PD
 	url = https://github.com/Lattice-Works/Billerica-MA-PD.git
+[submodule "Chelmsford-MA-PD"]
+	path = Chelmsford-MA-PD
+	url = https://github.com/Lattice-Works/Chelmsford-MA-PD.git
+[submodule "Lowell-MA-PD"]
+	path = Lowell-MA-PD
+	url = https://github.com/Lattice-Works/Lowell-MA-PD.git
