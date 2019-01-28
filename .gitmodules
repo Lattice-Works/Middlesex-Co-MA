@@ -13,3 +13,6 @@
 [submodule "Acton-PD"]
 	path = Acton-PD
 	url = https://github.com/Lattice-Works/Acton-PD.git
+[submodule "Arlington-MA-PD"]
+	path = Arlington-MA-PD
+	url = https://github.com/Lattice-Works/Arlington-MA-PD.git
