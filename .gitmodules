@@ -16,3 +16,6 @@
 [submodule "Arlington-MA-PD"]
 	path = Arlington-MA-PD
 	url = https://github.com/Lattice-Works/Arlington-MA-PD.git
+[submodule "Billerica-MA-PD"]
+	path = Billerica-MA-PD
+	url = https://github.com/Lattice-Works/Billerica-MA-PD.git
