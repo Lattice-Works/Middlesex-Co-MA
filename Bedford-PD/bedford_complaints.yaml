@@ -8,6 +8,11 @@ entityDefinitions:
       nc.SubjectIdentification:
         type: "nc.SubjectIdentification"
         column: "DEFENDANT_MSTR_NO"
+      ol.datasource:
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Bedford PD"
     conditions:
     - !<conditions.BooleanIsNullCondition>
       column: "DEFENDANT_MSTR_NO"
@@ -22,7 +27,14 @@ entityDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["ONLY_MISDEMEANORS_IND", "ONE_OR_MORE_FELONIES_IND", "COMMENTS"]
+          columns: ["DEFENDANT_MSTR_NO", "OFFENSE_DTE", "ONLY_MISDEMEANORS_IND", "ONE_OR_MORE_FELONIES_IND", "COMMENTS"]
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
       ol.notes:
         type: "ol.notes"
         column: "COMMENTS"
@@ -216,6 +228,7 @@ entityDefinitions:
         transforms:
         - !<transforms.ConcatTransform>
           columns: ["PRIMARY_STREET_NUM", "PRIMARY_STREET_NAME", "PRIMARY_STREET_DIRECTION", "PRIMARY_STREET_SUFFIX", "PRIMARY_CITY", "PRIMARY_STATE_CD", "PRIMARY_ZIP_CD", "PRIMARY_COUNTRY_CD"]
+          separator: " "
         - !<transforms.GeocoderTransform>
           addressObject: "geographypoint"
     conditions:
@@ -313,13 +326,22 @@ entityDefinitions:
 associationDefinitions:
   suspectedof:
     fqn: "ol.suspectedof"
-    entitySetName: "MiddlesexBedfordSuspectedof"
+    entitySetName: "MiddlesexBedfordSuspectedOf"
     src: "person"
     dst: "offenseevent"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
-        column: "DEFENDANT_MSTR_NO"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DEFENDANT_MSTR_NO", "OFFENSE_DTE", "COMPL_NO"]
+      general.datetime:
+        type: "general.datetime"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
     name: "suspectedof"
 
   locatedat:
@@ -345,7 +367,7 @@ associationDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["COMPL_TYPE_CD", "DEFENDANT_MSTR_NO"]
+          columns: ["COMPL_NO", "COMPL_TYPE_CD", "DEFENDANT_MSTR_NO", "OFFENSE_DTE"]
     name: "subjectof1"
 
   subjectof2:
@@ -358,8 +380,28 @@ associationDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["COMPL_TYPE_CD", "DEFENDANT_MSTR_NO"]
+          columns: ["COMPL_NO", "COMPL_TYPE_CD", "DEFENDANT_MSTR_NO", "OFFENSE_DTE"]
     name: "subjectof2"
+
+  subjectof3:
+    fqn: "ol.subjectof"
+    entitySetName: "MiddlesexBedfordSubjectOf"
+    src: "person"
+    dst: "summons"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMPL_NO", "COMPL_TYPE_CD", "DEFENDANT_MSTR_NO", "OFFENSE_DTE"]
+      date.completeddatetime:
+        type: "date.completeddatetime"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "subjectof3"
 
   appearsin:
     fqn: "ol.appearsin"
@@ -374,19 +416,6 @@ associationDefinitions:
           columns: ["COMPL_TYPE_CD", "DEFENDANT_MSTR_NO"]
     name: "appearsin"
 
-  subjectof4:
-    fqn: "ol.subjectof"
-    entitySetName: "MiddlesexBedfordSubjectOf"
-    src: "person"
-    dst: "summons"
-    propertyDefinitions:
-      ol.id:
-        type: "ol.id"
-        transforms:
-        - !<transforms.ConcatTransform>
-          columns: ["COMPL_TYPE_CD", "DEFENDANT_MSTR_NO"]
-    name: "subjectof4"
-
   has:
     fqn: "ol.has"
     entitySetName: "MiddlesexBedfordHas"
@@ -397,7 +426,14 @@ associationDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["DEFENDANT_MSTR_NO", "JUVENILE_IND"]
+          columns: ["DEFENDANT_MSTR_NO", "JUVENILE_IND", "OFFENSE_DTE"]
+      general.datetime:
+        type: "general.datetime"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
     name: "has"
 
   involvedin1:
@@ -424,6 +460,11 @@ associationDefinitions:
         transforms:
         - !<transforms.ConcatTransform>
           columns: ["COMPL_EMPL_NO", "COMPL_NO"]
+      ol.role:
+        type: "ol.role"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Officer"
     name: "involvedin2"
 
   relatedto1:
