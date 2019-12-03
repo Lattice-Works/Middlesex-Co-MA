@@ -1,0 +1,584 @@
+
+entityDefinitions:
+
+  person:
+    fqn: "general.person"
+    entitySetName: "MiddlesexBedfordPeople"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        column: "DEFENDANT_MSTR_NO"
+      ol.datasource:
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Bedford PD"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "DEFENDANT_MSTR_NO"
+      reverse: True
+    name: "person"
+
+  offenseevent:
+    fqn: "ol.chargeevent"
+    entitySetName: "MiddlesexBedfordOffenseEvents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DEFENDANT_MSTR_NO", "OFFENSE_DTE", "ONLY_MISDEMEANORS_IND", "ONE_OR_MORE_FELONIES_IND", "COMMENTS"]
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+      ol.notes:
+        type: "ol.notes"
+        column: "COMMENTS"
+      ol.onlymisdemeanors:
+        type: "ol.onlymisdemeanors"
+        column: "ONLY_MISDEMEANORS_IND"
+        transforms:
+        - !<transforms.ParseBoolTransform> {}
+      ol.oneormorefelonies:
+        type: "ol.oneormorefelonies"
+        column: "ONE_OR_MORE_FELONIES_IND"
+        transforms:
+        - !<transforms.ParseBoolTransform> {}
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "ONLY_MISDEMEANORS_IND"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "ONE_OR_MORE_FELONIES_IND"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "COMMENTS"
+      reverse: True
+    name: "offenseevent"
+
+  incident:
+    fqn: "ol.incident"
+    entitySetName: "MiddlesexBedfordIncidents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_NO"
+      ol.flightindicator:
+        type: "ol.flightindicator"
+        column: "FLIGHT_IND"
+        transforms:
+        - !<transforms.ParseBoolTransform> {}
+      ol.datetime_reported:
+        type: "ol.datetime_reported"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENSE_DTE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "FLIGHT_IND"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "COMPL_NO"
+      reverse: True
+    name: "incident"
+
+  employee:
+    fqn: "ol.employee"
+    entitySetName: "MiddlesexBedfordOfficers"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_EMPL_NO"
+      publicsafety.employeeid:
+        type: "publicsafety.employeeid"
+        column: "COMPL_EMPL_NO"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "COMPL_EMPL_NO"
+      reverse: True
+    name: "employee"
+
+  hearing:
+    fqn: "justice.case"
+    entitySetName: "MiddlesexBedfordHearings"
+    propertyDefinitions:
+      j.CaseNumberText:
+        type: "j.CaseNumberText"
+        column: "COMPL_TYPE_CD"
+      ol.type:
+        type: "ol.type"
+        column: "COMPL_TYPE_CD"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "COMPL_TYPE_CD"
+      pattern: "HEAR"
+      reverse: False
+    name: "hearing"
+
+  summons:
+    fqn: "ol.serviceofprocess"
+    entitySetName: "MiddlesexBedfordSummons"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_TYPE_CD"
+      ol.type:
+        type: "ol.type"
+        column: "COMPL_TYPE_CD"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "COMPL_TYPE_CD"
+      pattern: "SUM"
+      reverse: False
+    name: "summons"
+
+  arrest:
+    fqn: "ol.arrest"
+    entitySetName: "MiddlesexBedfordArrests"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_TYPE_CD"
+      ol.type:
+        type: "ol.type"
+        column: "COMPL_TYPE_CD"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "COMPL_TYPE_CD"
+      pattern: "\\bARR"
+      reverse: False
+    name: "arrest"
+
+  warrant:
+    fqn: "ol.warrant"
+    entitySetName: "MiddlesexBedfordWarrants"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_TYPE_CD"
+      ol.type:
+        type: "ol.type"
+        column: "COMPL_TYPE_CD"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "COMPL_TYPE_CD"
+      pattern: "WAR"
+      reverse: False
+    name: "warrant"
+
+  disposition:
+    fqn: "ol.disposition"
+    entitySetName: "MiddlesexBedfordDispositions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Accused, not arrested"
+    conditions:
+    - !<conditions.ConditionalAnd> {}
+    - !<conditions.BooleanRegexCondition>
+      column: "COMPL_TYPE_CD"
+      pattern: "\\bARR"
+      reverse: False
+    - !<conditions.BooleanRegexCondition>
+      column: "ACCUSED_NOT_ARRESTED_IND"
+      pattern: "Y"
+      reverse: False
+    name: "disposition"
+
+  location:
+    fqn: "ol.location"
+    entitySetName: "MiddlesexBedfordLocations"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "PRIMARY_ADDR_NO"
+      location.street:
+        type: "location.street"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["PRIMARY_STREET_NUM", "PRIMARY_STREET_NAME", "PRIMARY_STREET_DIRECTION", "PRIMARY_STREET_SUFFIX"]
+          separator: " "
+      location.city:
+        type: "location.city"
+        column: "PRIMARY_CITY"
+      location.state:
+        type: "location.state"
+        column: "PRIMARY_STATE_CD"
+      ol.country:
+        type: "ol.country"
+        column: "PRIMARY_COUNTRY_CD"
+      location.zip:
+        type: "location.zip"
+        column: "PRIMARY_ZIP_CD"
+      ol.locationcoordinates:
+        type: "ol.locationcoordinates"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["PRIMARY_STREET_NUM", "PRIMARY_STREET_NAME", "PRIMARY_STREET_DIRECTION", "PRIMARY_STREET_SUFFIX", "PRIMARY_CITY", "PRIMARY_STATE_CD", "PRIMARY_ZIP_CD", "PRIMARY_COUNTRY_CD"]
+          separator: " "
+        - !<transforms.GeocoderTransform>
+          addressObject: "geographypoint"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_ZIP_CD"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_COUNTRY_CD"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_STREET_NAME"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_STREET_DIRECTION"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_STREET_NUM"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_STREET_SUFFIX"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_ADDR_NO"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_STATE_CD"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_CITY"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_ZIP_CD"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIMARY_COUNTRY_CD"
+      reverse: True
+    name: "location"
+
+  persondetails:
+    fqn: "ol.persondetails"
+    entitySetName: "MiddlesexBedfordPersondetails"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "JUVENILE_IND"
+      person.juvenile:
+        type: "person.juvenile"
+        column: "JUVENILE_IND"
+        transforms:
+        - !<transforms.ParseBoolTransform> {}
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "JUVENILE_IND"
+      reverse: True
+    name: "persondetails"
+
+  injury:
+    fqn: "ol.injury"
+    entitySetName: "MiddlesexBedfordInjuries"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Bodily injury"
+      ol.description:
+        type: "ol.description"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Bodily injury"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "BODILY_INJURY_IND"
+      pattern: "Y"
+      reverse: False
+    name: "injury"
+
+  agency:
+    fqn: "ol.agency"
+    entitySetName: "MiddlesexBedfordAgencies"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_AGENCY"
+      ol.name:
+        type: "ol.name"
+        column: "COMPL_AGENCY"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "COMPL_AGENCY"
+      reverse: True
+    name: "agency"
+
+associationDefinitions:
+  suspectedof:
+    fqn: "ol.suspectedof"
+    entitySetName: "MiddlesexBedfordSuspectedOf"
+    src: "person"
+    dst: "offenseevent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DEFENDANT_MSTR_NO", "OFFENSE_DTE", "COMPL_NO"]
+      general.datetime:
+        type: "general.datetime"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "suspectedof"
+
+  locatedat:
+    fqn: "ol.locatedat"
+    entitySetName: "MiddlesexBedfordLocatedAt"
+    src: "incident"
+    dst: "location"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["PRIMARY_ADDR_NO", "COMPL_NO"]
+    name: "locatedat"
+
+  subjectof1:
+    fqn: "ol.subjectof"
+    entitySetName: "MiddlesexBedfordSubjectOf"
+    src: "person"
+    dst: "arrest"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMPL_NO", "COMPL_TYPE_CD", "DEFENDANT_MSTR_NO", "OFFENSE_DTE"]
+    name: "subjectof1"
+
+  subjectof2:
+    fqn: "ol.subjectof"
+    entitySetName: "MiddlesexBedfordSubjectOf"
+    src: "person"
+    dst: "warrant"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMPL_NO", "COMPL_TYPE_CD", "DEFENDANT_MSTR_NO", "OFFENSE_DTE"]
+    name: "subjectof2"
+
+  subjectof3:
+    fqn: "ol.subjectof"
+    entitySetName: "MiddlesexBedfordSubjectOf"
+    src: "person"
+    dst: "summons"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMPL_NO", "COMPL_TYPE_CD", "DEFENDANT_MSTR_NO", "OFFENSE_DTE"]
+      date.completeddatetime:
+        type: "date.completeddatetime"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "subjectof3"
+
+  appearsin:
+    fqn: "ol.appearsin"
+    entitySetName: "MiddlesexBedfordAppearsIn"
+    src: "person"
+    dst: "hearing"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMPL_TYPE_CD", "DEFENDANT_MSTR_NO"]
+    name: "appearsin"
+
+  has:
+    fqn: "ol.has"
+    entitySetName: "MiddlesexBedfordHas"
+    src: "person"
+    dst: "persondetails"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DEFENDANT_MSTR_NO", "JUVENILE_IND", "OFFENSE_DTE"]
+      general.datetime:
+        type: "general.datetime"
+        column: "OFFENSE_DTE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "has"
+
+  involvedin1:
+    fqn: "ol.involvedin"
+    entitySetName: "MiddlesexBedfordInvolvedIn"
+    src: "person"
+    dst: "incident"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DEFENDANT_MSTR_NO", "COMPL_NO"]
+    name: "involvedin1"
+
+  involvedin2:
+    fqn: "ol.involvedin"
+    entitySetName: "MiddlesexBedfordInvolvedIn"
+    src: "employee"
+    dst: "incident"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMPL_EMPL_NO", "COMPL_NO"]
+      ol.role:
+        type: "ol.role"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Officer"
+    name: "involvedin2"
+
+  relatedto1:
+    fqn: "ol.relatedto"
+    entitySetName: "MiddlesexBedfordRelatedTo"
+    src: "arrest"
+    dst: "offenseevent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_TYPE_CD"
+    name: "relatedto1"
+
+  relatedto2:
+    fqn: "ol.relatedto"
+    entitySetName: "MiddlesexBedfordRelatedTo"
+    src: "warrant"
+    dst: "offenseevent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_TYPE_CD"
+    name: "relatedto2"
+
+  relatedto3:
+    fqn: "ol.relatedto"
+    entitySetName: "MiddlesexBedfordRelatedTo"
+    src: "summons"
+    dst: "offenseevent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_TYPE_CD"
+    name: "relatedto3"
+
+  relatedto4:
+    fqn: "ol.relatedto"
+    entitySetName: "MiddlesexBedfordRelatedTo"
+    src: "hearing"
+    dst: "offenseevent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_TYPE_CD"
+    name: "relatedto4"
+
+  clearedby:
+    fqn: "ol.clearedby"
+    entitySetName: "MiddlesexBedfordClearedBy"
+    src: "offenseevent"
+    dst: "disposition"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["ONLY_MISDEMEANORS_IND", "ONE_OR_MORE_FELONIES_IND", "COMMENTS"]
+    name: "clearedby"
+
+  partof:
+    fqn: "ol.partof"
+    entitySetName: "MiddlesexBedfordPartOf"
+    src: "offenseevent"
+    dst: "incident"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_NO"
+    name: "partof"
+
+  resultsin:
+    fqn: "ol.resultsin"
+    entitySetName: "MiddlesexBedfordResultsIn"
+    src: "incident"
+    dst: "injury"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPL_NO"
+    name: "resultsin"
+
+  arrestedbyagency:
+    fqn: "ol.arrestedby"
+    entitySetName: "MiddlesexBedfordArrestedBy"
+    src: "person"
+    dst: "agency"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DEFENDANT_MSTR_NO", "COMPL_EMPL_NO"]
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "COMPL_TYPE_CD"
+      pattern: "\\bARR"
+      reverse: False
+    name: "arrestedbyagency"
+
+  arrestedbyemployee:
+    fqn: "ol.arrestedby"
+    entitySetName: "MiddlesexBedfordArrestedBy"
+    src: "person"
+    dst: "employee"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DEFENDANT_MSTR_NO", "COMPL_EMPL_NO"]
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "COMPL_TYPE_CD"
+      pattern: "\\bARR"
+      reverse: False
+    name: "arrestedbyemployee"
+
